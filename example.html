@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>示例页面</title>
+    <meta charset="utf-8">
+    <style>
+        .title{
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #61ff29;
+        }
+        .sec1{
+            height: 100px;
+            background-color: #c2c2c2;
+        }
+        .sec2{
+            position: absolute;
+            top: 40px;
+            width: 400px;
+            height: 100px;
+            background-color: #c2c2c2;
+        }
+    </style>
+</head>
+<body>
+<div class="title">测试1</div>
+<div class="sec1">
+    <form>
+        <div >
+            <input type="text" name="ipt1" id="ipt1" value="child.html">
+            <input type="button" id="view1" value="查看">
+        </div>
+    </form>
+</div>
+<div style="position: relative;">
+    <div class="title">测试2</div>
+    <div class="sec2" dom-twins-id="sec2">
+        <form>
+            <div >
+                <input type="button" id="view2" value="查看"
+                       dom-twins-target="sec2" dom-twins-onclose="DDD"
+                       dom-twins-href="child.html">
+            </div>
+        </form>
+    </div>
+</div>
+<script src="//cdn.bootcss.com/jquery/1.12.3/jquery.js"></script>
+<script src="domtwins.js"></script>
+<script>
+    var domTwins = $(".sec1").DomTwins();//new DomTwins($(".sec1"));
+    $("#view1").click(function(){
+        domTwins.open($("#ipt1").val(),function(d){
+            console.info("onclose",d);
+        });
+    });
+    function DDD(d){
+        console.info("onclose",d);
+    }
+</script>
+</body>
+</html>
