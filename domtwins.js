@@ -26,6 +26,7 @@
         this.htmlLoaderDom.hide();
         $("iframe",this.iframeDom).attr("src",url);
         this.iframeDom.show();
+        location.hash = "dom-twins-" + this.id;
     };
 
     function openHtml(html,onclose){
@@ -34,6 +35,7 @@
         selector.hide();
         this.iframeDom.hide();
         this.htmlLoaderDom.show();
+        location.hash = this.id;
     };
 
     function close(){
@@ -47,16 +49,22 @@
 
     function DomTwins(selector){
         this.selector = selector;
-        //初始化;
-        this.htmlLoaderDom = selector.clone(true).attr("copyNode",1).empty().hide();
-        this.iframeDom = this.htmlLoaderDom.clone(true).html("<iframe src='' frameborder='0' width='100%' height='100%'></iframe>");
-        $(selector).after(this.htmlLoaderDom).after(this.iframeDom);
-
         var domTwinsId = this.selector.attr(DOM_TWINS_ID);
         if(!domTwinsId){
             domTwinsId = "id_" + new Date().getTime() + Math.random();
             this.selector.attr(DOM_TWINS_ID,domTwinsId);
+        }else{
+            if(cache[domTwinsId]){
+                throw new Error("不允许出现相同的dom-twins-id："+domTwinsId);
+            }
         }
+        this.id = domTwinsId;
+
+        //初始化;
+        this.htmlLoaderDom = selector.clone(true).attr("dom-twins-copy",this.id).empty().hide();
+        this.iframeDom = this.htmlLoaderDom.clone(true).html("<iframe src='' frameborder='0' width='100%' height='100%'></iframe>");
+        $(selector).after(this.htmlLoaderDom).after(this.iframeDom);
+
         cache[domTwinsId] = this;
     }
 
