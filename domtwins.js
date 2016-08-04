@@ -4,10 +4,10 @@
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like enviroments that support module.exports,
         // like Node.
-        module.exports = factory(require('jQuery'));
+        module.exports = factory(require('jquery'));
     } else if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['jQuery'],factory);
+        define(['jquery'],factory);
     } else {
         // Browser globals
         factory(jQuery);
@@ -16,6 +16,55 @@
     if(!$){
         throw new Error("缺少依赖的jQuery");
     }
+    var browserVersion = window.navigator.userAgent.toUpperCase();
+    var isOpera = browserVersion.indexOf("OPERA") > -1 ? true : false;
+    var isFireFox = browserVersion.indexOf("FIREFOX") > -1 ? true : false;
+    var isChrome = browserVersion.indexOf("CHROME") > -1 ? true : false;
+    var isSafari = browserVersion.indexOf("SAFARI") > -1 ? true : false;
+    var isIE = (!!window.ActiveXObject || "ActiveXObject" in window);
+    var isIE9More = (! -[1, ] == false);
+    var iframes = [];
+    function reinitIframe(iframe, minHeight) {
+        try {
+//            var iframe = document.getElementById(iframeId);
+            var bHeight = 0;
+            if (isChrome == false && isSafari == false)
+                bHeight = iframe.contentWindow.document.body.scrollHeight;
+
+            var dHeight = 0;
+            if (isFireFox == true)
+                dHeight = iframe.contentWindow.document.documentElement.offsetHeight + 2;
+            else if (isIE == false && isOpera == false)
+                dHeight = iframe.contentWindow.document.documentElement.scrollHeight;
+            else if (isIE == true && isIE9More) {//ie9+
+                var heightDeviation = bHeight - eval("window.IE9MoreRealHeight" + 1);
+                if (heightDeviation == 0) {
+                    bHeight += 3;
+                } else if (heightDeviation != 3) {
+                    eval("window.IE9MoreRealHeight" + 1 + "=" + bHeight);
+                    bHeight += 3;
+                }
+            }
+            else//ie[6-8]、OPERA
+                bHeight += 3;
+
+            var height = Math.max(bHeight, dHeight);
+            if (height < minHeight) height = minHeight;
+            iframe.style.height = height + "px";
+        } catch (ex) { }
+    }
+    function addIframe(iframe,minHeight){
+        minHeight = minHeight || 1;
+        iframes.push({ iframe:iframe,minHeight:minHeight });
+    }
+    eval("window.IE9MoreRealHeight" + 1 + "=0");
+    window.setInterval(function(){
+        for(var i=0;i<iframes.length;i++){
+            reinitIframe(iframes[i].iframe,iframes[i].minHeight);
+        }
+    }, 100);
+
+
     var DOM_TWINS_ID = "dom-twins-id";
     var cache = {},id = 0,closeMethod = {};
 
@@ -66,9 +115,11 @@
 
         //初始化;
         this.htmlLoaderDom = selector.clone(true).attr("dom-twins-copy",this.id).empty().hide();
-        this.iframeDom = this.htmlLoaderDom.clone(true).html("<iframe src='' frameborder='0' width='100%' height='100%'></iframe>");
+        var iframe = $("<iframe src='' scrolling='no' frameborder='0' style='padding: 0px; width: 100%; height: 100%;'></iframe>");
+        this.iframeDom = this.htmlLoaderDom.clone(true)
+            .html(iframe);
         $(selector).after(this.htmlLoaderDom).after(this.iframeDom);
-
+        addIframe(iframe[0]);
         cache[domTwinsId] = this;
     }
 
