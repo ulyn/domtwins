@@ -37,8 +37,8 @@
 
 	domTwins.open(
 		"child.html",
-		function(d){
-            console.info("onclose",d);
+		function(dt,closeParams){
+            console.info("onclose",dt,closeParams);
      	}
 	);
 
@@ -48,12 +48,13 @@
 
 	parent.DomTwins.parentClose(this)；
 
-注：其中的this为child.html下的window或者dom均可
+注：其中的this为child.html下的window或者dom均可，建议使用window
 
 #### 当前页关闭 
 
-	domTwins.close()；
+	domTwins.close(closeParams)；
 
+closeParams可以是任意值，最终传递给onclose回调
 
 ## 也可以这么用 
 
@@ -71,6 +72,20 @@
                    dom-twins-href="child.html">
         </div>
     </div>
+
+定义onclose函数（全局的 (/ □ \)，你肯定会开骂...
+
+    function onclose(dt,oncloseParams){
+        console.info("onclose",dt,oncloseParams);
+    }
+
+好吧，开个onclose函数注册的，开心点，想怎么做都行
+
+    DomTwins.registerCloseMethod("onclose",
+        function(dt,oncloseParams){
+            console.info("myCloseMethod",dt,oncloseParams);
+        }
+    );
 
 ### 3.引入js ### 
 

@@ -17,33 +17,37 @@
         throw new Error("缺少依赖的jQuery");
     }
     var DOM_TWINS_ID = "dom-twins-id";
-    var cache = {};
+    var cache = {},id = 0,closeMethod = {};
 
     function open(url,onclose){
         this.onclose = onclose;
+        if(onclose && typeof onclose === 'string'){
+            this.onclose = closeMethod[onclose] || eval(onclose);
+        }
         var selector = this.selector;
         selector.hide();
         this.htmlLoaderDom.hide();
         $("iframe",this.iframeDom).attr("src",url);
         this.iframeDom.show();
-        location.hash = "dom-twins-" + this.id;
     };
 
     function openHtml(html,onclose){
         this.onclose = onclose;
+        if(onclose && typeof onclose === 'string'){
+            this.onclose = closeMethod[onclose] || eval(onclose);
+        }
         var selector = this.selector;
         selector.hide();
         this.iframeDom.hide();
         this.htmlLoaderDom.show();
-        location.hash = this.id;
     };
 
-    function close(){
+    function close(oncloseParams){
         var selector = this.selector;
         selector.show();
         this.iframeDom.hide();
         this.htmlLoaderDom.hide();
-        this.onclose && this.onclose(this);
+        this.onclose && typeof this.onclose === 'function' && this.onclose(this,oncloseParams);
         delete this.onclose;
     };
 
@@ -51,7 +55,7 @@
         this.selector = selector;
         var domTwinsId = this.selector.attr(DOM_TWINS_ID);
         if(!domTwinsId){
-            domTwinsId = "id_" + new Date().getTime() + Math.random();
+            domTwinsId = "id_" + ++id;
             this.selector.attr(DOM_TWINS_ID,domTwinsId);
         }else{
             if(cache[domTwinsId]){
@@ -73,20 +77,34 @@
         close:close
     }
 
-    DomTwins.parentClose = function(obj){
+    DomTwins.parentClose = function(dom,oncloseParams){
+        var $childFrameWindow = dom;
+        if(dom.toString() != "[object Window]"){
+            $childFrameWindow = dom.ownerDocument.defaultView;
+        }
         var bodyrel="temp"+ new Date().getTime();
-        var curDocument = obj.ownerDocument || obj.document;
+        var curDocument = $childFrameWindow.document;
         $("body",curDocument).attr("dom-twins-body-rel",bodyrel);
-        var parentDocument = curDocument.defaultView.parent.document;
+        var parentDocument = $childFrameWindow.parent.document;
         $(parentDocument).find("iframe").each(function(){
             var iframe = $(this);
             var tRel=$(this.contentWindow.document).find("body").attr("dom-twins-body-rel");
             if(tRel==bodyrel){
                 var $target = iframe.parent().prev();
                 var domTwins = cache[$target.attr(DOM_TWINS_ID)];
-                domTwins.close();
+                domTwins.close(oncloseParams);
             }
         });
+    }
+
+    DomTwins.registerCloseMethod = function(methodName,func){
+        if(typeof func != "function"){
+            throw new Error("入参func不是函数:" + func);
+        }
+        if(closeMethod.hasOwnProperty(methodName)){
+            throw new Error("同名函数注册只能注册一次:" + methodName);
+        }
+        closeMethod[methodName] = func;
     }
 
     $.fn.DomTwins = function(selector){
@@ -110,15 +128,7 @@
         if(!domTwins){
             domTwins = new DomTwins($target);
         }
-        domTwins.open( $this.attr("dom-twins-href"),
-            (function(){
-                var onclose = $this.attr("dom-twins-onclose");
-                if(onclose){
-                    var tempFunc = eval(onclose);
-                    return tempFunc;
-                }
-            })()
-        );
+        domTwins.open( $this.attr("dom-twins-href"),$this.attr("dom-twins-onclose"));
         return false;
     });
 

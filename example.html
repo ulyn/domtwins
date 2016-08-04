@@ -39,7 +39,7 @@
     <div class="sec2" dom-twins-id="sec2">
         <div >
             <input type="button" id="view2" value="查看"
-                   dom-twins-target="sec2" dom-twins-onclose="DDD"
+                   dom-twins-target="sec2" dom-twins-onclose="myCloseMethod"
                    dom-twins-href="child.html">
         </div>
     </div>
@@ -49,13 +49,14 @@
 <script>
     var domTwins = $(".sec1").DomTwins();//new DomTwins($(".sec1"));
     $("#view1").click(function(){
-        domTwins.open($("#ipt1").val(),function(d){
-            console.info("onclose",d);
+        domTwins.open($("#ipt1").val(),function(dt,oncloseParams){
+            console.info("onclose",dt,oncloseParams);
         });
     });
-    function DDD(d){
-        console.info("onclose",d);
+    function onclose(dt,oncloseParams){
+        console.info("onclose",dt,oncloseParams);
     }
+    DomTwins.registerCloseMethod("myCloseMethod",function(dt,oncloseParams){ console.info("myCloseMethod",dt,oncloseParams) });
 </script>
 </body>
 </html>
