@@ -114,10 +114,12 @@
         this.id = domTwinsId;
 
         //初始化;
-        this.htmlLoaderDom = selector.clone(true).attr("dom-twins-copy",this.id).empty().hide();
+        this.htmlLoaderDom = selector.clone(true)
+            .removeAttr("id").removeAttr("dom-twins-id")
+            .attr("dom-twins-copy",this.id).empty().hide();
         var iframe = $("<iframe src='' scrolling='no' frameborder='0' style='padding: 0px; width: 100%; height: 100%;'></iframe>");
         this.iframeDom = this.htmlLoaderDom.clone(true)
-            .html(iframe);
+            .append(iframe);
         $(selector).after(this.htmlLoaderDom).after(this.iframeDom);
         addIframe(iframe[0]);
         cache[domTwinsId] = this;
