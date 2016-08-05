@@ -60,7 +60,11 @@
     eval("window.IE9MoreRealHeight" + 1 + "=0");
     window.setInterval(function(){
         for(var i=0;i<iframes.length;i++){
-            reinitIframe(iframes[i].iframe,iframes[i].minHeight);
+            try{
+                reinitIframe(iframes[i].iframe,iframes[i].minHeight);
+            }catch (e){
+                //ignor ...
+            }
         }
     }, 100);
 
@@ -100,8 +104,9 @@
         delete this.onclose;
     };
 
-    function DomTwins(selector){
+    function DomTwins(selector,opts){
         this.selector = selector;
+        this.opts = opts;
         var domTwinsId = this.selector.attr(DOM_TWINS_ID);
         if(!domTwinsId){
             domTwinsId = "id_" + ++id;
@@ -121,7 +126,12 @@
         this.iframeDom = this.htmlLoaderDom.clone(true)
             .append(iframe);
         $(selector).after(this.htmlLoaderDom).after(this.iframeDom);
-        addIframe(iframe[0]);
+
+        if(opts.iframeFit != false){
+            //要计算iframeFit
+            addIframe(iframe[0]);
+        }
+
         cache[domTwinsId] = this;
     }
 
@@ -160,15 +170,13 @@
         closeMethod[methodName] = func;
     }
 
-    $.fn.DomTwins = function(selector){
-        if(!selector){
-            selector = $(this);
-        }
-        var domTwinsId = $(selector).attr(DOM_TWINS_ID);
+    $.fn.DomTwins = function(opts){
+        var selector = $(this);
+        var domTwinsId = selector.attr(DOM_TWINS_ID);
         if(domTwinsId){
             return cache[domTwinsId] || new DomTwins(selector);
         }else{
-            return new DomTwins(selector);
+            return new DomTwins(selector,opts);
         }
     }
     //支持配置的方式的节点
@@ -179,7 +187,8 @@
         var $target = $("["+ DOM_TWINS_ID +"="+ targetId +"]");
         var domTwins = cache[targetId];
         if(!domTwins){
-            domTwins = new DomTwins($target);
+            var iframeFit = $this.attr("dom-twins-iframeFit") || $this.attr("dom-twins-iframefit");
+            domTwins = new DomTwins($target,{ iframeFit : iframeFit === 'true' || iframeFit === '1'  });
         }
         domTwins.open( $this.attr("dom-twins-href"),$this.attr("dom-twins-onclose"));
         return false;
