@@ -106,7 +106,8 @@
                         html = e.state.html,
                         domtwins_id = e.state.domtwins_id,
                         onclose = e.state.onclose;
-                    if(status === 0){
+                    console.info(e.state);
+                    if(domtwins_status === 0){
                         //后退操作
                         if(domtwins_id && cache[domtwins_id]){
                             show(cache[domtwins_id],1);
