@@ -25,13 +25,21 @@
 	<script src="//cdn.bootcss.com/jquery/1.12.3/jquery.js"></script>
 	<script src="domtwins.js"></script>
 
-### 2.选择占位div进行初始化：注意不能取body
+### 2.选择占位div进行初始化：注意不能用body
 
-	var domTwins = $(".sec1").DomTwins();
+    var opts = {
+        iframeFit:true,
+        history:false
+    }
+	var domTwins = $(".sec1").DomTwins(opts);
 
 或
 
-	var domTwins = new DomTwins($(".sec1"));
+	var domTwins = new DomTwins($(".sec1"),opts);
+
+参数表示
+iframeFit:当使用iframe加载显示页面时，iframe是否自适应子页面高度。默认值为true
+history:是否支持后退前进操作，支持H5才有效，并且页面中只有一个DomTwins对象能生效。建议只有在切换整屏页面的时候才使用。默认值为false
 
 ###3.打开加载新的url 
 
@@ -62,7 +70,7 @@ closeParams可以是任意值，最终传递给onclose回调
 ### 1.配置占位div属性dom-twins-id 
 
 
-### 2.配置按钮属性dom-twins-target，dom-twins-href ，dom-twins-onclose 
+### 2.配置按钮属性dom-twins-target，dom-twins-href，dom-twins-onclose，dom-twins-iframeFit，dom-twins-history
 
 	
 	<div class="sec2" dom-twins-id="sec2">

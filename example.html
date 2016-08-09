@@ -24,7 +24,11 @@
         }
     </style>
 </head>
-<body>
+<body style="margin: 0;padding: 0">
+<div id="historyPage" dom-twins-id="historyPage">
+    <input type="button" id="view3" value="查看有历史！"
+           dom-twins-target="historyPage" dom-twins-onclose="myCloseMethod"
+           dom-twins-href="child.html" dom-twins-history="true" dom-twins-iframeFit="true">
 <div class="title">测试1</div>
 <div class="sec1" id="sec1">
     <form>
@@ -38,16 +42,17 @@
     <div class="title">测试2</div>
     <div class="sec2" dom-twins-id="sec2">
         <div >
-            <input type="button" id="view2" value="查看"
+            <input type="button" id="view2" value="查看" dom-twins-history="false"
                    dom-twins-target="sec2" dom-twins-onclose="myCloseMethod"
                    dom-twins-href="child.html">
         </div>
     </div>
 </div>
+</div>
 <script src="//cdn.bootcss.com/jquery/1.12.3/jquery.js"></script>
-<script src="domtwins.js"></script>
+<script src="domtwins.min.js"></script>
 <script>
-    var domTwins = $(".sec1").DomTwins();//new DomTwins($(".sec1"));
+    var domTwins = $(".sec1").DomTwins({ iframeFit:false });//new DomTwins($(".sec1"));
     $("#view1").click(function(){
         domTwins.open($("#ipt1").val(),function(dt,oncloseParams){
             console.info("onclose",dt,oncloseParams);
