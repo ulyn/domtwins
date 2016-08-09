@@ -102,7 +102,7 @@
             window.onpopstate = function(e){
                 if(e.state){
                     var url = e.state.url,
-                        status = e.state.status,
+                        domtwins_status = e.state.domtwins_status,
                         html = e.state.html,
                         domtwins_id = e.state.domtwins_id,
                         onclose = e.state.onclose;
@@ -111,7 +111,7 @@
                         if(domtwins_id && cache[domtwins_id]){
                             show(cache[domtwins_id],1);
                         }
-                    }else if(status === 1){
+                    }else if(domtwins_status === 1){
                         //前进操作
                         if(domtwins_id && cache[domtwins_id]){
                             if(url){
@@ -127,8 +127,8 @@
         open:function(domtwins,url,html,onclose){
             if(domtwins.opts.history){
                 var hashId = "#domtwins"+domtwins.id;
-                history.replaceState({ domtwins_id:domtwins.id,status:0 },"",location.href);
-                history.pushState({ domtwins_id:domtwins.id,opts:domtwins.opts,url:url,onclose:onclose,status:1 },"",hashId);
+                history.replaceState($.extend({},history.state,{ domtwins_id:domtwins.id,domtwins_status:0 }),"",location.href);
+                history.pushState({ domtwins_id:domtwins.id,opts:domtwins.opts,url:url,onclose:onclose,domtwins_status:1 },"",hashId);
             }
             if(url){
                 _open(domtwins,url,onclose);
