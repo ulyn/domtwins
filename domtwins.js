@@ -233,6 +233,7 @@
 
     DomTwins.prototype = {
         open:open,
+        openHtml:openHtml,
         close:close
     };
 
