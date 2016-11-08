@@ -252,6 +252,7 @@
     DomTwins.prototype = {
         version:"1.0.0",
         open:open,
+        openHtml:openHtml,
         close:close
     };
     DomTwins.closeThis = function(oncloseParams){
