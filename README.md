@@ -52,11 +52,19 @@ history:是否支持后退前进操作，支持H5才有效，并且页面中只�
 
 ### 4.关闭 
 
-#### iframe子页child.html中关闭后退调用 
+#### iframe子页面child.html中自关闭
 
-	parent.DomTwins.parentClose(this)；
+    DomTwins.closeThis(oncloseParams)；
 
-注：其中的this为child.html下的window或者dom均可，建议使用window
+注：child.html需要引入domtwins.js,若不引入也可以使用
+
+    parent.postMessage({ type:"close",data:oncloseParams },"*");
+
+#### iframe子页面child.html中自关闭(废弃，只支持同域)
+
+	parent.DomTwins.parentClose(window,oncloseParams)；
+
+注：其中的入参为child.html下的window或者dom均可，建议使用window
 
 #### 当前页关闭 
 

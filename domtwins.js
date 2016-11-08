@@ -106,7 +106,6 @@
                         html = e.state.html,
                         domtwins_id = e.state.domtwins_id,
                         onclose = e.state.onclose;
-                    console.info(e.state);
                     if(domtwins_status === 0){
                         //后退操作
                         if(domtwins_id && cache[domtwins_id]){
@@ -196,6 +195,25 @@
         History.back(this,oncloseParams);
     }
 
+    //监听iframe动作
+    function onmessage(e){
+        var type = e.data.type;
+        if(type === "close"){
+            for(var key in cache){
+                if(cache[key].iframeDom.find("iframe")[0].contentWindow == e.source){
+                    var domTwins = cache[key];
+                    domTwins.close(e.data.data);
+                    break;
+                }
+            }
+        }
+    }
+    if ('addEventListener' in document ) {
+        window.addEventListener('message', onmessage, false);
+    } else if ('attachEvent' in document ) {
+        window.attachEvent('onmessage', onmessage);
+    }
+
     function DomTwins(selector,opts){
         this.selector = selector;
         this.opts = $.extend({
@@ -232,10 +250,15 @@
     }
 
     DomTwins.prototype = {
+        version:"1.0.0",
         open:open,
         close:close
     };
-
+    DomTwins.closeThis = function(oncloseParams){
+//        var tag = "_domtwins_tag_" + new Date().getTime() + Math.random();
+//        window.name = tag;
+        parent.postMessage({ type:"close",data:oncloseParams },"*");
+    }
     DomTwins.parentClose = function(dom,oncloseParams){
         var $childFrameWindow = dom;
         if(dom.toString() != "[object Window]"){
