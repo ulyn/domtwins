@@ -266,7 +266,7 @@
 
     var CacheOncloseCount = 0;
     DomTwins.prototype = {
-        version:"1.0.0",
+        version:"1.0.1",
         open:open,
         openHtml:openHtml,
         close:close
