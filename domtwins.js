@@ -110,6 +110,14 @@
                         //后退操作
                         if(domtwins_id && cache[domtwins_id]){
                             show(cache[domtwins_id],1);
+                            //history的后退操作，增加onclose回调
+                            if(onclose && typeof onclose === 'string'){
+                                var closeDoes = closeMethod[onclose]|| eval(onclose);
+                                if(closeDoes && typeof closeDoes === 'function'){
+                                    closeDoes(cache[domtwins_id],null); //closeParams暂无效，不给处理了
+                                }
+                                delete closeMethod[onclose];
+                            }
                         }
                     }else if(domtwins_status === 1){
                         //前进操作
@@ -126,9 +134,16 @@
         },
         open:function(domtwins,url,html,onclose){
             if(domtwins.opts.history){
+                var functionClose = "";
                 var hashId = "#domtwins"+domtwins.id;
-                history.replaceState($.extend({},history.state,{ domtwins_id:domtwins.id,domtwins_status:0 }),"",location.href);
-                history.pushState({ domtwins_id:domtwins.id,opts:domtwins.opts,url:url,onclose:onclose,domtwins_status:1 },"",hashId);
+                if(typeof onclose === 'function'){
+                    functionClose = "CacheOnclose_" + CacheOncloseCount++;
+                    DomTwins.registerCloseMethod(functionClose,onclose);
+                }else{
+                    functionClose = onclose;
+                }
+                history.replaceState($.extend({},history.state,{ domtwins_id:domtwins.id,url:url,onclose:functionClose,domtwins_status:0 }),"",location.href);
+                history.pushState({ domtwins_id:domtwins.id,opts:domtwins.opts,url:url,onclose:functionClose,domtwins_status:1 },"",hashId);
             }
             if(url){
                 _open(domtwins,url,onclose);
@@ -249,6 +264,7 @@
         cache[domTwinsId] = this;
     }
 
+    var CacheOncloseCount = 0;
     DomTwins.prototype = {
         version:"1.0.0",
         open:open,

@@ -29,6 +29,10 @@
     <input type="button" id="view3" value="查看有历史！"
            dom-twins-target="historyPage" dom-twins-onclose="myCloseMethod"
            dom-twins-href="child.html" dom-twins-history="true" dom-twins-iframeFit="true">
+    <input type="button" id="view4" value="查看有历史！（JS控制）">
+    <div class="sec4" id="sec4">
+
+    </div>
 <div class="title">测试1</div>
 <div class="sec1" id="sec1">
     <form>
@@ -62,6 +66,13 @@
         console.info("onclose",dt,oncloseParams);
     }
     DomTwins.registerCloseMethod("myCloseMethod",function(dt,oncloseParams){ console.info("myCloseMethod",dt,oncloseParams) });
+
+    $("#view4").click(function(){
+        var domTwins = $(".sec4").DomTwins({ iframeFit:false,history:true });
+        domTwins.open("child.html",function(dt,oncloseParams){
+            console.info("history onclose",dt,oncloseParams);
+        });
+    });
 </script>
 </body>
 </html>
