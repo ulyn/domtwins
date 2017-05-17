@@ -109,14 +109,19 @@
                     if(domtwins_status === 0){
                         //后退操作
                         if(domtwins_id && cache[domtwins_id]){
-                            show(cache[domtwins_id],1);
+                            var domtwins = cache[domtwins_id];
+                            show(domtwins,1);
                             //history的后退操作，增加onclose回调
                             if(onclose && typeof onclose === 'string'){
                                 var closeDoes = closeMethod[onclose]|| eval(onclose);
                                 if(closeDoes && typeof closeDoes === 'function'){
-                                    closeDoes(cache[domtwins_id],null); //closeParams暂无效，不给处理了
+                                    closeDoes(domtwins,domtwins["_tmp_oncloseParams"]);
                                 }
-                                delete closeMethod[onclose];
+                                //bugfix　错误地将自定义的也删除掉了，此处应只删除缓存的。
+                                if(onclose.indexOf("___temp") !== -1
+                                    || onclose.indexOf("CacheOnclose_") !== -1 ){
+                                    delete closeMethod[onclose];
+                                }
                             }
                         }
                     }else if(domtwins_status === 1){
@@ -154,6 +159,7 @@
         back:function(domtwins,oncloseParams){
             if(this.historyDomtwins && domtwins.id === this.historyDomtwins.id
                 && "#domtwins"+domtwins.id === location.hash){
+                domtwins["_tmp_oncloseParams"] = oncloseParams;
                 history.back();
             }else{
                 _close(domtwins,oncloseParams);
@@ -266,7 +272,7 @@
 
     var CacheOncloseCount = 0;
     DomTwins.prototype = {
-        version:"1.0.1",
+        version:"1.0.2",
         open:open,
         openHtml:openHtml,
         close:close
