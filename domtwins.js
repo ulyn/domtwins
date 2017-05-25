@@ -117,11 +117,6 @@
                                 if(closeDoes && typeof closeDoes === 'function'){
                                     closeDoes(domtwins,domtwins["_tmp_oncloseParams"]);
                                 }
-                                //bugfix　错误地将自定义的也删除掉了，此处应只删除缓存的。
-                                if(onclose.indexOf("___temp") !== -1
-                                    || onclose.indexOf("CacheOnclose_") !== -1 ){
-                                    delete closeMethod[onclose];
-                                }
                             }
                         }
                     }else if(domtwins_status === 1){
@@ -142,7 +137,8 @@
                 var functionClose = "";
                 var hashId = "#domtwins"+domtwins.id;
                 if(typeof onclose === 'function'){
-                    functionClose = "CacheOnclose_" + CacheOncloseCount++;
+                    functionClose = "CacheOnclose_" + domtwins.id;
+                    delete closeMethod[functionClose];
                     DomTwins.registerCloseMethod(functionClose,onclose);
                 }else{
                     functionClose = onclose;
@@ -272,7 +268,7 @@
 
     var CacheOncloseCount = 0;
     DomTwins.prototype = {
-        version:"1.0.2",
+        version:"1.0.3",
         open:open,
         openHtml:openHtml,
         close:close
