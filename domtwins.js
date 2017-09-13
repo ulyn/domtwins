@@ -217,10 +217,15 @@
         var type = e.data.type;
         if(type === "close"){
             for(var key in cache){
-                if(cache[key].iframeDom.find("iframe")[0].contentWindow == e.source){
-                    var domTwins = cache[key];
-                    domTwins.close(e.data.data);
-                    break;
+                try{
+                    var frame = cache[key].iframeDom.find("iframe")[0];
+                    if(frame && frame.contentWindow == e.source){
+                        var domTwins = cache[key];
+                        domTwins.close(e.data.data);
+                        break;
+                    }
+                }catch (e){
+                    Console.warn("异常",e);
                 }
             }
         }
@@ -268,7 +273,7 @@
 
     var CacheOncloseCount = 0;
     DomTwins.prototype = {
-        version:"1.0.3",
+        version:"1.0.4",
         open:open,
         openHtml:openHtml,
         close:close
