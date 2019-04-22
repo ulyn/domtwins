@@ -53,7 +53,17 @@
             iframe.style.height = height + "px";
         } catch (ex) { }
     }
-    function addIframe(iframe,minHeight){
+    function removeIframe($iframe) {
+        //remove auto calc height iframe
+        for (var i = 0; i < iframes.length; i++) {
+            if(iframes[i].iframe === $iframe[0]){
+                iframes.splice(i, 1);
+                break;
+            }
+        }
+        $iframe.remove();
+    }
+    function addIframeAutoCalcHeight(iframeDom,minHeight){
         if(iframes.length == 0){
             eval("window.IE9MoreRealHeight" + 1 + "=0");
             window.setInterval(function(){
@@ -168,8 +178,18 @@
     }
     function _open(domtwins,url,onclose){
         domtwins.onclose = onclose;
-        $("iframe",domtwins.iframeDom).attr("src",url);
-        show(domtwins,2);
+        var iframe = $("iframe",domtwins.iframeDom);
+        if(iframe.attr("src")){
+            var newIframe = $("<iframe src='"+ url +"' scrolling='no' frameborder='0' style='padding: 0px; width: 100%; height: 100%;'></iframe>");
+            iframe.after(newIframe);
+            removeIframe(iframe);
+            if (domtwins.opts.iframeFit != false) {
+                addIframeAutoCalcHeight(newIframe[0])
+            }
+        }else{
+            iframe.attr("src", url);
+        }
+        show(domtwins, 2)
     }
     function show(domtwins,type){
         var selector = domtwins.selector;
@@ -265,7 +285,7 @@
 
         if(this.opts.iframeFit != false){
             //要计算iframeFit
-            addIframe(iframe[0]);
+            addIframeAutoCalcHeight(iframe[0]);
         }
 
         cache[domTwinsId] = this;
@@ -273,7 +293,7 @@
 
     var CacheOncloseCount = 0;
     DomTwins.prototype = {
-        version:"1.0.4",
+        version:"1.0.5",
         open:open,
         openHtml:openHtml,
         close:close
