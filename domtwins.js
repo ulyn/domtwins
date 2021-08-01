@@ -232,6 +232,13 @@
         History.back(this,oncloseParams);
     }
 
+    function destroy(){
+        var domTwinsId = this.selector.attr(DOM_TWINS_ID);
+        this.htmlLoaderDom.remove();
+        this.iframeDom.remove();
+        delete cache[domTwinsId];
+    }
+
     //监听iframe动作
     function onmessage(e){
         var type = e.data.type;
@@ -296,7 +303,8 @@
         version:"1.0.5",
         open:open,
         openHtml:openHtml,
-        close:close
+        close:close,
+        destroy:destroy
     };
     DomTwins.closeThis = function(oncloseParams){
 //        var tag = "_domtwins_tag_" + new Date().getTime() + Math.random();
